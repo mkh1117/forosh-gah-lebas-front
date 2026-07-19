@@ -87,7 +87,7 @@ const About = () => {
             { year: 'اکنون', title: 'آینده نزدیک', desc: 'گسترش ارسال اکسپرس به ۱۰ شهر و ارائه سرویس استایلینگ شخصی.' },
           ].map((item) => (
             <div key={item.year} className='p-5 rounded-2xl bg-gray-50 border border-gray-100'>
-              <p className='text-pink-600 font-semibold'>{item.year}</p>
+              <p className=' font-semibold text-pink-600'>{item.year}</p>
               <h3 className='text-xl font-bold text-gray-900 mt-1'>{item.title}</h3>
               <p className='text-sm text-gray-600 mt-2 leading-relaxed'>{item.desc}</p>
             </div>

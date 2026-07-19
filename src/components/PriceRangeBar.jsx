@@ -3,62 +3,58 @@ import noUiSlider from "nouislider";
 import 'nouislider/dist/nouislider.css';
 
 const PriceRangeSlider = ({ min = 0, max = 1000000, onChange }) => {
-  const sliderRef = useRef(null);
+  const sliderRef  = useRef(null);
+  const onChangeRef = useRef(onChange); // همیشه آخرین onChange رو داره بدون re-init
   const [range, setRange] = useState([min, max]);
 
+  // onChangeRef رو همیشه آپدیت نگه‌دار
   useEffect(() => {
-    if (!sliderRef.current) return;
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
+  // فقط یه بار slider می‌سازیم
+  useEffect(() => {
     const slider = sliderRef.current;
+    if (!slider) return;
 
-    // بررسی اینکه آیا اسلایدر قبلاً ساخته شده یا نه
-    if (!slider.noUiSlider) {
-      noUiSlider.create(slider, {
-        start: [min, max],
-        connect: true,
-        range: { min, max },
-        step: 10000,
-        tooltips: false,
-        format: {
-          to: (value) => Math.round(value),
-          from: (value) => parseFloat(value)
-        }
-      });
-    } else {
-      slider.noUiSlider.updateOptions({
-        start: [min, max],
-        range: { min, max },
-      });
-    }
-
-    // تنظیمات هنگام تغییر مقدار اسلایدر
-    slider.noUiSlider.on("update", (values) => {
-      const [low, high] = values.map((v) => Math.round(v));
-      setRange([low, high]);
-      onChange?.([low, high]);
+    noUiSlider.create(slider, {
+      start    : [min, max],
+      connect  : true,
+      range    : { min, max },
+      step     : 10000,
+      tooltips : false,
+      format   : {
+        to   : (v) => Math.round(v),
+        from : (v) => parseFloat(v),
+      },
     });
 
-    // پاکسازی هنگام خروج از کامپوننت
-    return () => {
-      if (slider.noUiSlider) {
-        slider.noUiSlider.off("update");
-      }
-    };
-  }, [min, max]);
+    // "change" فقط وقتی کاربر رها کنه صدا می‌زنه (نه هر pixel)
+    slider.noUiSlider.on("change", (values) => {
+      const parsed = values.map((v) => Math.round(Number(v)));
+      setRange(parsed);
+      onChangeRef.current?.(parsed);
+    });
+
+    // "update" فقط برای نمایش live در UI (بدون fetch)
+    slider.noUiSlider.on("update", (values) => {
+      setRange(values.map((v) => Math.round(Number(v))));
+    });
+
+    return () => slider.noUiSlider?.destroy();
+  }, []); // فقط mount/unmount
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between mb-3">
-        <div className="px-3 py-1 bg-gray-100 rounded-lg text-sm font-medium">
+    <div className="w-full px-1">
+      <div ref={sliderRef} className="my-2" />
+      <div className="flex justify-between mt-3">
+        <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm font-medium">
           {range[0].toLocaleString()} تومان
-        </div>
-
-        <div className="px-3 py-1 bg-gray-100 rounded-lg text-sm font-medium">
+        </span>
+        <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm font-medium">
           {range[1].toLocaleString()} تومان
-        </div>
+        </span>
       </div>
-
-      <div ref={sliderRef} className="my-4"></div>
     </div>
   );
 };

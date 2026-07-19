@@ -1,5 +1,6 @@
 import React from 'react'
 import { Routes,Route, Router } from 'react-router-dom'
+import { CartProvider } from "./components/CartContext";
 import Home from './pages/Home'
 import Collection from './pages/Collection'
 import About from './pages/About'
@@ -14,6 +15,7 @@ import Navbar from './components/Navbar'
 
 const App = () => {
   return (
+    <CartProvider>
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
       <Navbar/>
       <Routes>
@@ -29,6 +31,7 @@ const App = () => {
       <Route path='/order' element={<Oders/>} />
        </Routes>
     </div>
+    </CartProvider>
   )
 }
 
