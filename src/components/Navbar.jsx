@@ -4,21 +4,24 @@ import { useCart } from "../components/CartContext";
 import { assets } from '../assets/assets';
 
 const NAV_LINKS = [
-  { to: '/',           label: 'خانه' },
+  { to: '/',          label: 'خانه' },
   { to: '/collection', label: 'محصولات' },
   { to: '/about',      label: 'درباره ما' },
   { to: '/contact',    label: 'تماس' },
 ];
 
 const Navbar = () => {
-  const [menuOpen,   setMenuOpen]   = useState(false);
+  const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user,       setUser]       = useState(null);
+  const [searchOpen,  setSearchOpen]  = useState(false); // استیت جدید برای باکس سرچ
+  const [searchQuery, setSearchQuery] = useState('');    // متن جستجو
+  const [isLoggedIn,  setIsLoggedIn]  = useState(false);
+  const [user,        setUser]        = useState(null);
 
   const { cartItems } = useCart();
   const navigate      = useNavigate();
   const profileRef    = useRef(null);
+  const searchInputRef = useRef(null); // رفرنس برای فوکوس روی اینپوت
 
   useEffect(() => {
     const checkAuth = () => {
@@ -43,6 +46,18 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  // فوکوس روی اینپوت سرچ هنگام باز شدن و کلید Esc برای بستن
+  useEffect(() => {
+    if (searchOpen) {
+      searchInputRef.current?.focus();
+    }
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSearchOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [searchOpen]);
+
   const handleLogout = async () => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -61,6 +76,16 @@ const Navbar = () => {
     navigate('/');
   };
 
+  // مدیریت ارسال فرم سرچ
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/collection?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
+
   const initials = user?.name
     ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2)
     : '؟';
@@ -71,7 +96,9 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between gap-6">
 
           {/* لوگو */}
-          <img src={assets.logo} className='w-32 h-12' alt='Logo' />
+          <Link to="/">
+            <img src={assets.logo} className='w-32 h-12 object-contain' alt='Logo' />
+          </Link>
 
           {/* منوی دسکتاپ */}
           <nav className="hidden md:flex items-center gap-6">
@@ -96,8 +123,16 @@ const Navbar = () => {
           {/* آیکون‌ها */}
           <div className="flex items-center gap-3">
 
-            {/* جستجو */}
-            <button className="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition">
+            {/* دکمه باز کردن جستجو */}
+            <button 
+              onClick={() => setSearchOpen(prev => !prev)}
+              aria-label="جستجو"
+              className={`p-2 rounded-lg transition ${
+                searchOpen 
+                  ? 'bg-pink-50 text-pink-600' 
+                  : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+              }`}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                 <circle cx="11" cy="11" r="7"/><path strokeLinecap="round" d="M16.5 16.5l4 4"/>
               </svg>
@@ -178,6 +213,47 @@ const Navbar = () => {
             </button>
           </div>
         </div>
+
+        {/* ── باکس سرچ (کشویی) ── */}
+        {searchOpen && (
+          <div className="bg-gray-50 border-t border-b border-gray-100 py-3 px-4 transition-all duration-300">
+            <div className="max-w-3xl mx-auto">
+              <form onSubmit={handleSearchSubmit} className="relative flex items-center">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="نام محصول، دسته‌بندی یا برند مورد نظر را بنویسید..."
+                  className="w-full pl-10 pr-12 py-2.5 bg-white border border-gray-200 rounded-2xl text-sm focus:outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100 transition shadow-sm"
+                />
+                
+                {/* آیکون سرچ داخل اینپوت (دکمه Submit) */}
+                <button
+                  type="submit"
+                  className="absolute right-3 text-gray-400 hover:text-pink-500 p-1 transition"
+                  aria-label="جستجو"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                    <circle cx="11" cy="11" r="7"/><path strokeLinecap="round" d="M16.5 16.5l4 4"/>
+                  </svg>
+                </button>
+
+                {/* دکمه بستن باکس سرچ */}
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className="absolute left-3 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition"
+                  aria-label="بستن"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ── منوی کشویی موبایل ── */}

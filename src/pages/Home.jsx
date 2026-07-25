@@ -75,7 +75,7 @@ const Home = () => {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.15] tracking-tight text-white">
               استایل منحصربه‌فردت رو
               <br />
-              <span className="bg-gradient-to-l from-pink-400 via-rose-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-l from-pink-600 via-rose-400 to-violet-100 bg-clip-text text-transparent">
                 امروز خلق کن
               </span>
             </h1>

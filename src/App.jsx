@@ -12,6 +12,8 @@ import  Register  from './pages/Register'
 import PlaceOrder from './pages/PlaceOrder'
 import Oders from './pages/Oders'
 import Navbar from './components/Navbar'
+import Checkout from './pages/Checkout'
+import Terms from './pages/Terms'
 
 const App = () => {
   return (
@@ -29,6 +31,8 @@ const App = () => {
       <Route path='/register' element={<Register/>} />
       <Route path='/place-order' element={<PlaceOrder/>}/>
       <Route path='/order' element={<Oders/>} />
+      <Route path='/Checkout' element={<Checkout/>} />
+      <Route path='/Terms' element={<Terms/>} />
        </Routes>
     </div>
     </CartProvider>

@@ -143,30 +143,32 @@ const Product = () => {
       </div>
 
       {/* ── main card ── */}
-      <div className="px-4 md:px-12 py-6">
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col lg:flex-row">
+<div className="px-4 md:px-12 py-6">
+  <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col lg:flex-row">
 
-          {/* تصویر */}
-          <div className="lg:w-1/2 bg-gray-100 relative min-h-72 flex items-center justify-center overflow-hidden">
-            {!imgLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full border-4 border-pink-300 border-t-transparent animate-spin" />
-              </div>
-            )}
-            <img
-              src={IMG_BASE + product.picture}
-              alt={product.title}
-              onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full max-h-[520px] object-cover transition-opacity duration-500 ${
-                imgLoaded ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-            {hasSaleActive && (
-              <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
-                {product.discount_percent}٪ تخفیف
-              </div>
-            )}
-          </div>
+    {/* تصویر - تغییرات در این دیو و تگ img اعمال شده است */}
+    <div className="lg:w-1/2 bg-gray-100 relative h-[350px] md:h-[500px] lg:h-[600px] flex items-center justify-center overflow-hidden p-4">
+      {!imgLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+          <div className="w-10 h-10 rounded-full border-4 border-pink-300 border-t-transparent animate-spin" />
+        </div>
+      )}
+      <img
+        src={IMG_BASE + product.picture}
+        alt={product.title}
+        onLoad={() => setImgLoaded(true)}
+        
+        className={`max-w-full max-h-full object-contain transition-opacity duration-500 ${
+          imgLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+      {hasSaleActive && (
+        <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg z-20">
+          {product.discount_percent}٪ تخفیف
+        </div>
+      )}
+    </div>
+
 
           {/* اطلاعات */}
           <div className="lg:w-1/2 p-6 md:p-10 flex flex-col gap-6">

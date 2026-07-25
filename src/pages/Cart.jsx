@@ -1,6 +1,6 @@
 import React from "react";
 import { useCart } from "../components/CartContext";
-
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 const Cart = () => {
   const {
     cartItems,
@@ -125,12 +125,14 @@ const Cart = () => {
                 <span>{total.toLocaleString("fa-IR")} تومان</span>
               </div>
             </div>
+            <Link to="/Checkout">
             <button
               className="w-full mt-6 py-3 rounded-full bg-pink-600 text-white font-semibold hover:-translate-y-0.5 transition transform shadow-lg disabled:opacity-60"
               disabled={cartItems.length === 0}
             >
               ادامه به پرداخت
-            </button>
+              </button>
+            </Link>
             <p className="text-xs text-gray-500 mt-3">
               تسویه امن با درگاه‌های معتبر و امکان مرجوعی تا ۷ روز پس از تحویل.
             </p>
@@ -141,9 +143,11 @@ const Cart = () => {
             <p className="text-sm text-white/90 leading-relaxed mb-3">
               در تهران ارسال اکسپرس و در سایر شهرها تحویل زمان‌بندی‌شده داریم.
             </p>
+            <Link to="/terms">
             <button className="bg-white text-pink-700 font-semibold px-5 py-2 rounded-full hover:-translate-y-0.5 transition">
               قوانین و پشتیبانی
             </button>
+            </Link>
           </div>
         </div>
 
