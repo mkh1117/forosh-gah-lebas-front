@@ -14,8 +14,7 @@ const categoryPersian = {
   اکسسوری    : "اکسسوری",
 };
 
-// fromCollection = true  → دکمه «مشاهده محصول» (بدون سبد مستقیم)
-// fromCollection = false → دکمه «افزودن به سبد» (صفحه جزئیات که سایز/رنگ انتخاب شده)
+
 const ProductCard = ({
   id, title, price, category, image,
   sale, discount_percent,

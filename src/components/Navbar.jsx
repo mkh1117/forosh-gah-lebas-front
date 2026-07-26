@@ -32,7 +32,11 @@ const Navbar = () => {
     };
     checkAuth();
     window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
+    window.addEventListener('authChange', checkAuth);
+    return () => {
+    window.removeEventListener('storage', checkAuth);
+    window.removeEventListener('authChange', checkAuth); 
+  };
   }, []);
 
   // بستن dropdown پروفایل با کلیک بیرون

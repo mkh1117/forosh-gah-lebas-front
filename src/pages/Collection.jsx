@@ -6,6 +6,7 @@ import emptyAnimation from "/src/animations/Error 404.json";
 import PriceRangeSlider from "../components/PriceRangeBar";
 import Sitefooter from '../components/footer';
 
+
 const API_BASE  = "http://127.0.0.1:8000/api";
 const IMG_BASE  = "http://127.0.0.1:8000/picture/";
 
@@ -40,7 +41,7 @@ const Collection = () => {
   const [selectedSizes,  setSelectedSizes]  = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [saleOnly,       setSaleOnly]       = useState(false);
-  const [priceRange,     setPriceRange]     = useState([0, 1000000]);
+  const [priceRange,     setPriceRange]     = useState([0, 1000000000]);
 
   const [products, setProducts] = useState([]);
   const [loading,  setLoading]  = useState(false);
@@ -211,6 +212,7 @@ const Collection = () => {
             <ProductCard key={product.id} {...product} fromCollection />
           ))}
         </div>
+        
       ) : (
         <div className="flex flex-col items-center text-center mt-16">
           <Lottie animationData={emptyAnimation} className="w-64 h-64" />

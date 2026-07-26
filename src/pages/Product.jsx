@@ -4,6 +4,7 @@ import Lottie from "lottie-react";
 import emptyAnimation from "/src/animations/Error 404.json";
 import Sitefooter from '../components/footer';
 import { useCart } from '../components/CartContext';
+import RecommendedProducts from "../components/RecommendedProducts";
 
 const API_BASE = "http://127.0.0.1:8000/api";
 const IMG_BASE = "http://127.0.0.1:8000/picture/";
@@ -344,7 +345,7 @@ const Product = () => {
           </div>
         </div>
       </div>
-
+      <RecommendedProducts currentProductId={product.id} />
       <Sitefooter />
     </div>
   );

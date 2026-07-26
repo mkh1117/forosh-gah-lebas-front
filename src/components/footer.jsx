@@ -21,10 +21,10 @@ return(
     <div>
       <h3 className="text-lg font-semibold text-gray-800 mb-4">دسترسی سریع</h3>
       <ul className="space-y-3 text-gray-600 text-sm">
-        <li className="hover:text-gray-900 cursor-pointer">صفحه اصلی</li>
-        <li className="hover:text-gray-900 cursor-pointer">محصولات</li>
-        <li className="hover:text-gray-900 cursor-pointer">قوانین و مقررات</li>
-        <li className="hover:text-gray-900 cursor-pointer">تماس با ما</li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/">صفحه اصلی</a></li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/collection">محصولات</a></li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/terms">قوانین و مقررات</a></li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/contact">تماس با ما</a></li>
       </ul>
     </div>
 
@@ -32,10 +32,10 @@ return(
     <div>
       <h3 className="text-lg font-semibold text-gray-800 mb-4">دسته‌بندی‌ها</h3>
       <ul className="space-y-3 text-gray-600 text-sm">
-        <li className="hover:text-gray-900 cursor-pointer">مردانه</li>
-        <li className="hover:text-gray-900 cursor-pointer">زنانه</li>
-        <li className="hover:text-gray-900 cursor-pointer">کفش</li>
-        <li className="hover:text-gray-900 cursor-pointer">اکسسوری</li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/collection?category=مردانه">مردانه</a></li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/collection?category=زنانه">زنانه</a></li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/collection?category=کفش">کفش</a></li>
+        <li className="hover:text-gray-900 cursor-pointer"><a href="/collection?category=اکسسوری">اکسسوری</a></li>
       </ul>
     </div>
 
