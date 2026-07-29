@@ -14,6 +14,7 @@ import Oders from './pages/Oders'
 import Navbar from './components/Navbar'
 import Checkout from './pages/Checkout'
 import Terms from './pages/Terms'
+import Profile from './pages/Profile'
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
       <Route path='/orders' element={<Oders/>} />
       <Route path='/Checkout' element={<Checkout/>} />
       <Route path='/Terms' element={<Terms/>} />
+      <Route path='/Profile' element={<Profile/>} />
        </Routes>
     </div>
     </CartProvider>
