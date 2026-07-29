@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from "../components/CartContext";
 import { assets } from '../assets/assets';
 
@@ -13,15 +13,24 @@ const NAV_LINKS = [
 const Navbar = () => {
   const [menuOpen,    setMenuOpen]    = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [searchOpen,  setSearchOpen]  = useState(false); // استیت جدید برای باکس سرچ
-  const [searchQuery, setSearchQuery] = useState('');    // متن جستجو
+  const [searchOpen,  setSearchOpen]  = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoggedIn,  setIsLoggedIn]  = useState(false);
   const [user,        setUser]        = useState(null);
 
+  const [searchParams] = useSearchParams();
   const { cartItems } = useCart();
   const navigate      = useNavigate();
   const profileRef    = useRef(null);
-  const searchInputRef = useRef(null); // رفرنس برای فوکوس روی اینپوت
+  const searchInputRef = useRef(null);
+
+  // همگام‌سازی اینپوت سرچ با URL
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -34,9 +43,9 @@ const Navbar = () => {
     window.addEventListener('storage', checkAuth);
     window.addEventListener('authChange', checkAuth);
     return () => {
-    window.removeEventListener('storage', checkAuth);
-    window.removeEventListener('authChange', checkAuth); 
-  };
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('authChange', checkAuth); 
+    };
   }, []);
 
   // بستن dropdown پروفایل با کلیک بیرون
@@ -86,7 +95,9 @@ const Navbar = () => {
     if (searchQuery.trim()) {
       navigate(`/collection?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchOpen(false);
-      setSearchQuery('');
+    } else {
+      navigate('/collection');
+      setSearchOpen(false);
     }
   };
 
