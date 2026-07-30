@@ -47,22 +47,26 @@ const Product = () => {
 
   const { addToCart } = useCart();
 
-  /* ── add to cart ────────────────────────────────────────── */
+  
   const handleAddToCart = () => {
-    if (!selectedSize || !selectedColor) {
+    if (!selectedSize || !selectedColor || !selectedVariant) {
       setCartMsg('warn');
       setTimeout(() => setCartMsg(''), 2500);
       return;
     }
+
     addToCart({
       id: product.id,
+      variant_id: selectedVariant.id, 
+      product_variant_id: selectedVariant.id, 
       title: product.title,
-      price: finalPrice,  // قیمت variant انتخاب‌شده (با احتساب تخفیف)
+      price: finalPrice,  
       image: IMG_BASE + product.picture,
       size: selectedSize,
       color: selectedColor,
       qty: quantity,
     });
+
     setCartMsg('success');
     setTimeout(() => setCartMsg(''), 2500);
   };

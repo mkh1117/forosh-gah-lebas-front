@@ -1,40 +1,100 @@
 import React, { useState } from "react";
 import { useCart } from "../components/CartContext";
+import { useNavigate } from "react-router-dom";
+
+const API_BASE = "http://127.0.0.1:8000/api";
 
 const Checkout = () => {
-  const { cartItems, subtotal, shipping, discount, total } = useCart();
+  const { cartItems, subtotal, shipping, discount, total, clearCart } = useCart();
+  const navigate = useNavigate();
 
-  // استیت فرم آدرس
+  // استیت‌های فرم
   const [addressData, setAddressData] = useState({
-    fullName: "",
+    receiver_name: "",
     phone: "",
     province: "",
     city: "",
-    postalCode: "",
+    postal_code: "",
     address: "",
     note: "",
   });
 
-  // استیت روش ارسال (پیش‌فرض: پیشتاز)
   const [shippingMethod, setShippingMethod] = useState("express");
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAddressData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmitOrder = (e) => {
+  const handleSubmitOrder = async (e) => {
     e.preventDefault();
-    // کد مربوط به ارسال داده‌ها به API و انتقال به درگاه پرداخت
-    console.log("اطلاعات سفارش:", { addressData, shippingMethod, cartItems, total });
-    alert("در حال انتقال به درگاه پرداخت...");
+    setErrorMessage("");
+
+    if (cartItems.length === 0) {
+      alert("سبد خرید شما خالی است!");
+      return;
+    }
+
+    setLoading(true);
+
+   
+    const fullAddress = `استان ${addressData.province}، شهر ${addressData.city}، ${addressData.address} ${
+      addressData.postal_code ? `(کد پستی: ${addressData.postal_code})` : ""
+    } ${addressData.note ? `- توضیحات: ${addressData.note}` : ""}`;
+
+    
+    const orderPayload = {
+      receiver_name: addressData.receiver_name,
+      phone: addressData.phone,
+      address: fullAddress.trim(),
+      items: cartItems.map((item) => ({
+        product_variant_id: item.variant_id || item.product_variant_id || item.id,
+        quantity: Number(item.qty || item.quantity || 1),
+      })),
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(`${API_BASE}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify(orderPayload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (clearCart) clearCart();
+        alert(data.message || "سفارش با موفقیت ثبت شد.");
+        navigate(`/orders`);
+      } else {
+        // دریافت خطاهای Validation یا خطای عدم موجودی از لاراول
+        if (data.errors) {
+          const firstError = Object.values(data.errors)[0][0];
+          setErrorMessage(firstError);
+        } else {
+          setErrorMessage(data.message || "خطا در ثبت سفارش.");
+        }
+      }
+    } catch (error) {
+      console.error("خطا در ارتباط با سرور:", error);
+      setErrorMessage("اتصال به سرور برقرار نشد.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-full text-gray-800" dir="rtl">
       <section className="mt-10 grid lg:grid-cols-3 gap-8 items-start">
-        
-        {/* ── فرم اطلاعات آدرس و روش ارسال ── */}
+        {/* ── فرم دریافت آدرس ── */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -43,8 +103,13 @@ const Checkout = () => {
             <span className="text-sm text-pink-600 font-medium">مرحله ۲ از ۲</span>
           </div>
 
+          {errorMessage && (
+            <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+              {errorMessage}
+            </div>
+          )}
+
           <form id="checkout-form" onSubmit={handleSubmitOrder} className="space-y-6">
-            {/* باکس اطلاعات گیرنده */}
             <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
               <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">
                 اطلاعات گیرنده و آدرس
@@ -53,13 +118,13 @@ const Checkout = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">
-                    نام و نام خانوادگی *
+                    نام و نام خانوادگی گیرنده *
                   </label>
                   <input
                     type="text"
-                    name="fullName"
+                    name="receiver_name"
                     required
-                    value={addressData.fullName}
+                    value={addressData.receiver_name}
                     onChange={handleInputChange}
                     placeholder="مثلاً: سارا احمدی"
                     className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition"
@@ -118,8 +183,8 @@ const Checkout = () => {
                 </label>
                 <input
                   type="text"
-                  name="postalCode"
-                  value={addressData.postalCode}
+                  name="postal_code"
+                  value={addressData.postal_code}
                   onChange={handleInputChange}
                   placeholder="۱۲۳۴۵۶۷۸۹۰"
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition"
@@ -136,7 +201,7 @@ const Checkout = () => {
                   required
                   value={addressData.address}
                   onChange={handleInputChange}
-                  placeholder="خیابان، پلاک، واحد..."
+                  placeholder="خیابان، کوچه، پلاک، واحد..."
                   className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition resize-none"
                 />
               </div>
@@ -156,12 +221,12 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* انتخاب روش ارسال */}
+            {/* روش ارسال */}
             <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-3">
               <h2 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">
                 روش ارسال
               </h2>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label
                   onClick={() => setShippingMethod("express")}
@@ -180,7 +245,6 @@ const Checkout = () => {
                   />
                   <div>
                     <p className="text-sm font-semibold text-gray-900">ارسال اکسپرس / پیک</p>
-                    <p className="text-xs text-gray-500 mt-0.5">تحویل ۲۴ تا ۴۸ ساعت آینده</p>
                   </div>
                 </label>
 
@@ -201,7 +265,6 @@ const Checkout = () => {
                   />
                   <div>
                     <p className="text-sm font-semibold text-gray-900">پست پیشتاز</p>
-                    <p className="text-xs text-gray-500 mt-0.5">تحویل ۳ تا ۵ روز کاری</p>
                   </div>
                 </label>
               </div>
@@ -209,24 +272,25 @@ const Checkout = () => {
           </form>
         </div>
 
-        {/* ── خلاصه سفارش و پرداخت ── */}
+        {/* ── خلاصه سفارش و دکمه پرداخت ── */}
         <div className="space-y-4">
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 mb-4">خلاصه سفارش</h2>
 
-            {/* مروری کوتاه بر اقلام سبد خرید */}
             <div className="max-h-52 overflow-y-auto space-y-3 mb-4 pr-1">
               {cartItems.map((item) => (
                 <div key={`${item.id}-${item.size}-${item.color}`} className="flex items-center gap-3 text-xs">
-                  <img src={item.image} alt={item.title} className="w-12 h-14 object-cover rounded-lg bg-gray-100 flex-shrink-0" />
+                  {item.image && (
+                    <img src={item.image} alt={item.title} className="w-12 h-14 object-cover rounded-lg bg-gray-100 flex-shrink-0" />
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-800 truncate">{item.title}</p>
                     <p className="text-gray-400 mt-0.5">
-                      {item.qty} عدد | سایز: {item.size}
+                      {item.qty || item.quantity} عدد {item.size ? `| سایز: ${item.size}` : ""} {item.color ? `| رنگ: ${item.color}` : ""}
                     </p>
                   </div>
                   <span className="font-semibold text-gray-700 flex-shrink-0">
-                    {(item.price * item.qty).toLocaleString("fa-IR")} تومان
+                    {((item.price) * (item.qty || item.quantity)).toLocaleString("fa-IR")} تومان
                   </span>
                 </div>
               ))}
@@ -248,27 +312,21 @@ const Checkout = () => {
                 </div>
               )}
               <div className="border-t border-gray-100 pt-3 flex items-center justify-between text-base font-bold text-gray-900">
-                <span>مبلغ نهایی پرداخت</span>
+                <span>مبلغ نهایی</span>
                 <span className="text-pink-600">{total.toLocaleString("fa-IR")} تومان</span>
               </div>
             </div>
 
-            {/* دکمه ارسال فرم */}
             <button
               type="submit"
               form="checkout-form"
-              disabled={cartItems.length === 0}
-              className="w-full mt-6 py-3.5 rounded-full bg-pink-600 text-white font-semibold hover:-translate-y-0.5 transition transform shadow-lg shadow-pink-200 disabled:opacity-60 cursor-pointer"
+              disabled={cartItems.length === 0 || loading}
+              className="w-full mt-6 py-3.5 rounded-full bg-pink-600 text-white font-semibold hover:-translate-y-0.5 transition transform shadow-lg shadow-pink-200 disabled:opacity-60 cursor-pointer flex justify-center items-center gap-2"
             >
-              پرداخت و ثبت نهایی سفارش
+              {loading ? "در حال ثبت سفارش..." : "ثبت و پرداخت نهایی سفارش"}
             </button>
-
-            <p className="text-xs text-gray-500 mt-3 text-center">
-              🔒 اتصال مستقیم به درگاه بانکی شاپرک (پرداخت امن)
-            </p>
           </div>
         </div>
-
       </section>
     </div>
   );

@@ -157,11 +157,6 @@ export default function Login() {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
-        {/* ورود با گوگل */}
-        <button className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm">
-          <img src="/google-icon.png" className="w-5 h-5" alt="Google" />
-          ورود با گوگل
-        </button>
 
         <p className="text-center mt-6 text-sm text-gray-600">
           حساب ندارید؟
